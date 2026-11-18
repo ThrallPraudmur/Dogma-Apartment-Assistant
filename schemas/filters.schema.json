@@ -1,0 +1,14 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"ApartmentSearchFilters",
+  "type":"object",
+  "additionalProperties":false,
+  "properties":{
+    "budget_min":{"type":"number","minimum":0},
+    "budget_max":{"type":"number","minimum":0},
+    "area_min":{"type":"number","minimum":0},
+    "area_max":{"type":"number","minimum":0},
+    "project":{"type":"string","minLength":1},
+    "rooms":{"type":"integer","minimum":0}
+  }
+}

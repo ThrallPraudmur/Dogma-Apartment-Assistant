@@ -1,0 +1,12 @@
+{
+ "$schema":"https://json-schema.org/draft/2020-12/schema",
+ "title":"AgentExtraction",
+ "type":"object",
+ "additionalProperties":false,
+ "required":["filters","needs_clarification","clarification_question"],
+ "properties":{
+  "filters":{"$ref":"filters.schema.json"},
+  "needs_clarification":{"type":"boolean"},
+  "clarification_question":{"type":["string","null"]}
+ }
+}

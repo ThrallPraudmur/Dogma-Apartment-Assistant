@@ -1,0 +1,124 @@
+{
+  "metadata": {
+    "source": "https://service.dogma.ru/api/layouts-filter/v4/objects/filter",
+    "started_at": "2026-11-18T12:11:58.313Z",
+    "finished_at": "2026-11-18T12:16:24.283Z",
+    "scope": {
+      "type": 1,
+      "statuses": [
+        2
+      ],
+      "cities": "all"
+    },
+    "reported_count": 14994,
+    "downloaded_rows": 14994,
+    "unique_count": 14994,
+    "duplicates": 0,
+    "count_changed": true,
+    "complete": false,
+    "price_policy": "positive cost_sale, otherwise cost",
+    "status_policy": "code 2 used by public catalog; other statuses not collected"
+  },
+  "sqlite_count": 14994,
+  "projects": [
+    {
+      "project": "DОГМА ПАРК",
+      "apartments": 1806,
+      "min_price_rub": 3162730,
+      "min_area_m2": 19.2,
+      "max_area_m2": 85.8
+    },
+    {
+      "project": "ГРЕЙД",
+      "apartments": 432,
+      "min_price_rub": 4429800,
+      "min_area_m2": 20.7,
+      "max_area_m2": 82.3
+    },
+    {
+      "project": "Догма Юкки",
+      "apartments": 652,
+      "min_price_rub": 3628640,
+      "min_area_m2": 19.69,
+      "max_area_m2": 73.49
+    },
+    {
+      "project": "Космопарк",
+      "apartments": 336,
+      "min_price_rub": 3637264,
+      "min_area_m2": 22.48,
+      "max_area_m2": 78.1
+    },
+    {
+      "project": "МКР Самолёт",
+      "apartments": 6218,
+      "min_price_rub": 3614623,
+      "min_area_m2": 19.8,
+      "max_area_m2": 222.4
+    },
+    {
+      "project": "Парк Победы",
+      "apartments": 1894,
+      "min_price_rub": 3631551,
+      "min_area_m2": 22,
+      "max_area_m2": 101
+    },
+    {
+      "project": "Парк Победы 3",
+      "apartments": 177,
+      "min_price_rub": 4260825,
+      "min_area_m2": 21.75,
+      "max_area_m2": 79.62
+    },
+    {
+      "project": "Порто-Ново",
+      "apartments": 555,
+      "min_price_rub": 4338789,
+      "min_area_m2": 19.8,
+      "max_area_m2": 103.7
+    },
+    {
+      "project": "Публицист",
+      "apartments": 636,
+      "min_price_rub": 4321729,
+      "min_area_m2": 17.33,
+      "max_area_m2": 84.76
+    },
+    {
+      "project": "РИДЗ",
+      "apartments": 502,
+      "min_price_rub": 4325376,
+      "min_area_m2": 21.7,
+      "max_area_m2": 82.3
+    },
+    {
+      "project": "Рекорд 2",
+      "apartments": 975,
+      "min_price_rub": 5425616,
+      "min_area_m2": 24.5,
+      "max_area_m2": 101.9
+    },
+    {
+      "project": "САМОЛЁТ 7",
+      "apartments": 206,
+      "min_price_rub": 5430240,
+      "min_area_m2": 21.5,
+      "max_area_m2": 85
+    },
+    {
+      "project": "Снегири",
+      "apartments": 310,
+      "min_price_rub": 4689706,
+      "min_area_m2": 27,
+      "max_area_m2": 86.5
+    },
+    {
+      "project": "ЭВО",
+      "apartments": 295,
+      "min_price_rub": 12133930,
+      "min_area_m2": 30.24,
+      "max_area_m2": 98.61
+    }
+  ],
+  "example_matches": 219
+}
