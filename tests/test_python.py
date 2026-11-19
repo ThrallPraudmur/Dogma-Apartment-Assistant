@@ -80,9 +80,28 @@ class AgentTests(unittest.TestCase):
         self.assertEqual(post.call_count, 2)
 
     @patch("agent.requests.post")
-    def test_rate_limit_is_safe_and_not_retried(self, post):
+    def test_all_rate_limited_remain_safe(self, post):
         post.return_value = Mock(status_code=429)
-        with self.assertRaisesRegex(AgentError, "перегружена"):
+        with self.assertRaisesRegex(AgentError, "Фильтры"):
+            extract("квартира", {}, [], [], "test-only-key")
+        self.assertEqual(post.call_count, 2)
+        self.assertEqual(post.call_args_list[1].kwargs["json"]["model"], "openrouter/free")
+
+    @patch("agent.requests.post")
+    def test_rate_limit_switches_to_free_router(self, post):
+        valid = Mock(status_code=200)
+        valid.json.return_value = {"model": "another/provider:free", "choices": [{"message": {"content": json.dumps(change({"budget_max": 7000000}))}}], "usage": {"cost": 0}}
+        post.side_effect = [Mock(status_code=429), valid]
+        result, meta = extract("до 7 млн", {}, [], [], "test-only-key")
+        self.assertEqual(result["filters"], {"budget_max": 7000000})
+        self.assertTrue(meta["used_fallback"])
+        self.assertEqual(meta["cost"], 0)
+        self.assertEqual(post.call_args_list[1].kwargs["json"]["model"], "openrouter/free")
+
+    @patch("agent.requests.post")
+    def test_invalid_key_not_retried(self, post):
+        post.return_value = Mock(status_code=401)
+        with self.assertRaisesRegex(AgentError, "недействителен"):
             extract("квартира", {}, [], [], "test-only-key")
         self.assertEqual(post.call_count, 1)
 

@@ -5,6 +5,8 @@ import requests
 from catalog import FIELDS, validate_filters
 
 DEFAULT_MODEL = "inclusionai/ling-3.2-flash:free"
+FREE_ROUTER = "openrouter/free"
+TEMPORARY_FAILURE = "Бесплатные модели сейчас недоступны или достигнут лимит OpenRouter. Используйте режим «Фильтры» без модели либо повторите позже. Текущие условия сохранены."
 
 
 class AgentError(Exception):
@@ -57,22 +59,32 @@ def extract(query, current, history, projects, api_key, model=DEFAULT_MODEL):
     messages.extend({"role": m["role"], "content": m["content"][:4000]} for m in history[-12:] if m["role"] in ("user", "assistant"))
     messages.append({"role": "user", "content": query})
     for attempt in range(2):
+        # The second attempt changes the provider/model pool, never to a paid model.
+        selected_model = model if attempt == 0 else FREE_ROUTER
         try:
-            response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}, json={"model": model, "temperature": 0, "max_tokens": 2048, "response_format": {"type": "json_object"}, "messages": messages}, timeout=(10, 45))
+            response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}, json={"model": selected_model, "temperature": 0, "max_tokens": 2048, "response_format": {"type": "json_object"}, "messages": messages}, timeout=(10, 30))
         except requests.RequestException:
-            raise AgentError("OpenRouter не ответил вовремя. Повторите запрос; текущие условия сохранены.") from None
+            if not attempt:
+                continue
+            raise AgentError(TEMPORARY_FAILURE) from None
         if response.status_code != 200:
-            hints = {401: "Ключ OpenRouter недействителен.", 402: "OpenRouter ограничил доступ по балансу или лимиту ключа.", 403: "OpenRouter запретил доступ к модели. Проверьте настройки аккаунта.", 429: "Бесплатная модель сейчас перегружена или достигнут лимит. Повторите позже."}
+            if response.status_code in (404, 408, 429, 500, 502, 503, 504):
+                if not attempt:
+                    continue
+                raise AgentError(TEMPORARY_FAILURE)
+            hints = {401: "Ключ OpenRouter недействителен.", 402: "OpenRouter ограничил доступ по балансу или лимиту ключа.", 403: "OpenRouter запретил доступ к модели. Проверьте настройки аккаунта."}
             raise AgentError(hints.get(response.status_code, f"OpenRouter временно недоступен (HTTP {response.status_code}). Повторите позже."))
         try:
             payload = response.json()
             if payload.get("error"):
+                if not attempt and str(payload["error"].get("code")) in ("404", "408", "429", "500", "502", "503", "504"):
+                    continue
                 raise AgentError("OpenRouter вернул ошибку модели. Повторите позже.")
             content = payload["choices"][0]["message"]["content"]
             data = validate_extraction(json.loads(content))
             # Check cross-field constraints against the existing state before committing.
             merge_filters(current, data)
-            return data, {"model": payload.get("model", model), "cost": payload.get("usage", {}).get("cost")}
+            return data, {"model": payload.get("model", selected_model), "cost": payload.get("usage", {}).get("cost"), "used_fallback": bool(attempt)}
         except (ValueError, KeyError, IndexError, TypeError):
             if attempt:
                 raise AgentError("Модель не смогла сформировать корректные параметры. Переформулируйте запрос; прежние условия сохранены.") from None
